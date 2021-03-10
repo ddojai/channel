@@ -5,6 +5,7 @@ import com.github.ddojai.microservices.api.core.product.Product;
 import com.github.ddojai.microservices.api.core.recommendation.Recommendation;
 import com.github.ddojai.microservices.api.core.review.Review;
 import com.github.ddojai.microservices.util.http.ServiceUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -16,6 +17,7 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
     private final ServiceUtil serviceUtil;
     private final ProductCompositeIntegration integration;
 
+    @Autowired
     public ProductCompositeServiceImpl(ServiceUtil serviceUtil,
                                        ProductCompositeIntegration integration) {
         this.serviceUtil = serviceUtil;

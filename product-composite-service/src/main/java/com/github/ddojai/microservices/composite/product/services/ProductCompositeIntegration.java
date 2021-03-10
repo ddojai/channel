@@ -46,8 +46,8 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
         @Value("${app.product-service.host}") String productServiceHost,
         @Value("${app.product-service.port}") int productServicePort,
 
-        @Value("${app.recommedation-service.host}") String recommendationServiceHost,
-        @Value("${app.recommedation-service.port}") int recommendationServicePort,
+        @Value("${app.recommendation-service.host}") String recommendationServiceHost,
+        @Value("${app.recommendation-service.port}") int recommendationServicePort,
 
         @Value("${app.review-service.host}") String reviewServiceHost,
         @Value("${app.review-service.port}") int reviewServicePort
