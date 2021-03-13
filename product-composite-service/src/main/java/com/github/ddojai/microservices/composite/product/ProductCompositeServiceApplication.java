@@ -31,7 +31,7 @@ public class ProductCompositeServiceApplication {
     @Value("${api.common.contact.email}")     String apiContactEmail;
 
     /**
-     * Will exposed on $HOST:$PORT/swagger-ui.html
+     * Will exposed on $HOST:$PORT/swagger-ui/index.html
      *
      * @return
      */
