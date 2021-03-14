@@ -1,10 +1,9 @@
 buildscript {
 	ext {
-		springBootVersion = '2.3.4.RELEASE'
+		springBootVersion = '2.3.2.RELEASE'
 	}
 	repositories {
 		mavenCentral()
-		jcenter()
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -19,13 +18,12 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
-group = 'com.github.ddojai.microservices.api'
+group = 'se.magnus.microservices.api'
 version = '1.0.0-SNAPSHOT'
 sourceCompatibility = 1.8
 
 repositories {
 	mavenCentral()
-	jcenter()
 }
 
 dependencies {
