@@ -1,83 +1,143 @@
 package com.github.ddojai.microservices.core.product;
 
+import com.github.ddojai.microservices.api.core.product.Product;
+import com.github.ddojai.microservices.core.product.persistence.ProductRepository;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
+import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static reactor.core.publisher.Mono.just;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment=RANDOM_PORT)
-
+@SpringBootTest(webEnvironment = RANDOM_PORT, properties = {"spring.data.mongodb.port: 0"})
 public class ProductServiceApplicationTests {
 
-  @Autowired
-  private WebTestClient client;
+    @Autowired
+    private WebTestClient client;
 
-  @Test
-  public void getProductById() {
+    @Autowired
+    private ProductRepository repository;
 
-    int productId = 1;
+    @Before
+    public void setupDb() {
+        repository.deleteAll();
+    }
 
-    client.get()
-        .uri("/product/" + productId)
-        .accept(APPLICATION_JSON)
-        .exchange()
-        .expectStatus().isOk()
-        .expectHeader().contentType(APPLICATION_JSON)
-        .expectBody()
-        .jsonPath("$.productId").isEqualTo(productId);
-  }
+    @Test
+    public void getProductById() {
 
-  @Test
-  public void getProductInvalidParameterString() {
+        int productId = 1;
 
-    client.get()
-        .uri("/product/no-integer")
-        .accept(APPLICATION_JSON)
-        .exchange()
-        .expectStatus().isEqualTo(BAD_REQUEST)
-        .expectHeader().contentType(APPLICATION_JSON)
-        .expectBody()
-        .jsonPath("$.path").isEqualTo("/product/no-integer");
-//        .jsonPath("$.message").isEqualTo("Type mismatch.");
-  }
+        postAndVerifyProduct(productId, OK);
 
-  @Test
-  public void getProductNotFound() {
+        assertTrue(repository.findByProductId(productId).isPresent());
 
-    int productIdNotFound = 13;
+        getAndVerifyProduct(productId, OK)
+            .jsonPath("$.productId").isEqualTo(productId);
+    }
 
-    client.get()
-        .uri("/product/" + productIdNotFound)
-        .accept(APPLICATION_JSON)
-        .exchange()
-        .expectStatus().isNotFound()
-        .expectHeader().contentType(APPLICATION_JSON)
-        .expectBody()
-        .jsonPath("$.path").isEqualTo("/product/" + productIdNotFound)
-        .jsonPath("$.message").isEqualTo("No product found for productId: " + productIdNotFound);
-  }
+    @Test
+    public void duplicateError() {
 
-  @Test
-  public void getProductInvalidParameterNegativeValue() {
+        int productId = 1;
 
-    int productIdInvalid = -1;
+        postAndVerifyProduct(productId, OK);
 
-    client.get()
-        .uri("/product/" + productIdInvalid)
-        .accept(APPLICATION_JSON)
-        .exchange()
-        .expectStatus().isEqualTo(UNPROCESSABLE_ENTITY)
-        .expectHeader().contentType(APPLICATION_JSON)
-        .expectBody()
-        .jsonPath("$.path").isEqualTo("/product/" + productIdInvalid)
-        .jsonPath("$.message").isEqualTo("Invalid productId: " + productIdInvalid);
-  }
+        assertTrue(repository.findByProductId(productId).isPresent());
+
+        postAndVerifyProduct(productId, UNPROCESSABLE_ENTITY)
+            .jsonPath("$.path").isEqualTo("/product")
+            .jsonPath("$.message").isEqualTo("Duplicate key, Product Id: " + productId);
+    }
+
+    @Test
+    public void deleteProduct() {
+
+        int productId = 1;
+
+        postAndVerifyProduct(productId, OK);
+        assertTrue(repository.findByProductId(productId).isPresent());
+
+        deleteAndVerifyProduct(productId, OK);
+        assertFalse(repository.findByProductId(productId).isPresent());
+
+        deleteAndVerifyProduct(productId, OK);
+    }
+
+    @Test
+    public void getProductInvalidParameterString() {
+
+        getAndVerifyProduct("/no-integer", BAD_REQUEST)
+            .jsonPath("$.path").isEqualTo("/product/no-integer")
+            .jsonPath("$.message").isEqualTo("Type mismatch.");
+    }
+
+    @Test
+    public void getProductNotFound() {
+
+        int productIdNotFound = 13;
+        getAndVerifyProduct(productIdNotFound, NOT_FOUND)
+            .jsonPath("$.path").isEqualTo("/product/" + productIdNotFound)
+            .jsonPath("$.message").isEqualTo("No product found for productId: " + productIdNotFound);
+    }
+
+    @Test
+    public void getProductInvalidParameterNegativeValue() {
+
+        int productIdInvalid = -1;
+
+        getAndVerifyProduct(productIdInvalid, UNPROCESSABLE_ENTITY)
+            .jsonPath("$.path").isEqualTo("/product/" + productIdInvalid)
+            .jsonPath("$.message").isEqualTo("Invalid productId: " + productIdInvalid);
+    }
+
+    private WebTestClient.BodyContentSpec getAndVerifyProduct(int productId,
+                                                              HttpStatus expectedStatus) {
+        return getAndVerifyProduct("/" + productId, expectedStatus);
+    }
+
+    private WebTestClient.BodyContentSpec getAndVerifyProduct(String productIdPath,
+                                                              HttpStatus expectedStatus) {
+        return client.get()
+            .uri("/product" + productIdPath)
+            .accept(APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isEqualTo(expectedStatus)
+            .expectHeader().contentType(APPLICATION_JSON)
+            .expectBody();
+    }
+
+    private WebTestClient.BodyContentSpec postAndVerifyProduct(int productId,
+                                                               HttpStatus expectedStatus) {
+        Product product = new Product(productId, "Name " + productId, productId, "SA");
+        return client.post()
+            .uri("/product")
+            .body(just(product), Product.class)
+            .accept(APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isEqualTo(expectedStatus)
+            .expectHeader().contentType(APPLICATION_JSON)
+            .expectBody();
+    }
+
+    private WebTestClient.BodyContentSpec deleteAndVerifyProduct(int productId,
+                                                                 HttpStatus expectedStatus) {
+        return client.delete()
+            .uri("/product/" + productId)
+            .accept(APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isEqualTo(expectedStatus)
+            .expectBody();
+    }
+
 }
