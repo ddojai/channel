@@ -34,8 +34,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final Scheduler scheduler;
 
     @Autowired
-    public ReviewServiceImpl(Scheduler scheduler, ReviewRepository repository,
-                             ReviewMapper mapper, ServiceUtil serviceUtil) {
+    public ReviewServiceImpl(Scheduler scheduler, ReviewRepository repository, ReviewMapper mapper, ServiceUtil serviceUtil) {
         this.scheduler = scheduler;
         this.repository = repository;
         this.mapper = mapper;
@@ -45,15 +44,13 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public Review createReview(Review body) {
 
-        if (body.getProductId() < 1)
-            throw new InvalidInputException("Invalid productId: " + body.getProductId());
+        if (body.getProductId() < 1) throw new InvalidInputException("Invalid productId: " + body.getProductId());
 
         try {
             ReviewEntity entity = mapper.apiToEntity(body);
             ReviewEntity newEntity = repository.save(entity);
 
-            LOG.debug("createReview: created a review entity: {}/{}", body.getProductId(),
-                body.getReviewId());
+            LOG.debug("createReview: created a review entity: {}/{}", body.getProductId(), body.getReviewId());
             return mapper.entityToApi(newEntity);
 
         } catch (DataIntegrityViolationException dive) {
@@ -87,8 +84,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         if (productId < 1) throw new InvalidInputException("Invalid productId: " + productId);
 
-        LOG.debug("deleteReviews: tries to delete reviews for the product with productId: {}",
-            productId);
+        LOG.debug("deleteReviews: tries to delete reviews for the product with productId: {}", productId);
         repository.deleteAll(repository.findByProductId(productId));
     }
 
