@@ -1,6 +1,11 @@
-# microservices
+# channel
 
 - https://github.com/PacktPublishing/Hands-On-Microservices-with-Spring-Boot-and-Spring-Cloud
+
+## init microservices
+```cmd
+./create-projects.bash
+```
 
 ## local
 
