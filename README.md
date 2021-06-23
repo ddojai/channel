@@ -2,7 +2,7 @@
 
 - https://github.com/PacktPublishing/Hands-On-Microservices-with-Spring-Boot-and-Spring-Cloud
 
-## init microservices
+## create projects
 ```cmd
 ./create-projects.bash
 ```
