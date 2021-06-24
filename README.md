@@ -14,6 +14,11 @@
 ./grdelw clean build
 ```
 
+### run
+```cmd
+java -jar microservices/product-service/build/libs/*.jar &
+```
+
 ### test
 ```cmd
 ./test-em-all.bash
