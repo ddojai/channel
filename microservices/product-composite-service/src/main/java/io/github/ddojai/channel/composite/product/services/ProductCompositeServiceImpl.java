@@ -4,12 +4,15 @@ import io.github.ddojai.api.composite.product.*;
 import io.github.ddojai.api.core.product.Product;
 import io.github.ddojai.api.core.recommendation.Recommendation;
 import io.github.ddojai.api.core.review.Review;
+import io.github.ddojai.util.exceptions.NotFoundException;
 import io.github.ddojai.util.http.ServiceUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RestController
 public class ProductCompositeServiceImpl implements ProductCompositeService {
 
     private final ServiceUtil serviceUtil;
@@ -25,7 +28,11 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
     @Override
     public ProductAggregate getProduct(int productId) {
         Product product = integration.getProduct(productId);
+        if (product == null) {
+            throw new NotFoundException("No product found for productId: " + productId);
+        }
         List<Recommendation> recommendations = integration.getRecommendations(productId);
+
         List<Review> reviews = integration.getReviews(productId);
 
         return createProductAggregate(product, recommendations, reviews,
