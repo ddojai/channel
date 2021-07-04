@@ -28,6 +28,7 @@ java -jar microservices/product-service/build/libs/*.jar &
 
 ### build and run
 ```cmd
+# gradle build를 안할 경우 수정내용이 반영이 안된다. (application.yml)
 ./grdelw clean build
 docker-compose build
 docker-compose up -d
