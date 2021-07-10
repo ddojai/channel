@@ -60,7 +60,7 @@ public class PersistenceTests {
         repository.save(savedEntity);
 
         ProductEntity foundEntity = repository.findById(savedEntity.getId()).get();
-        assertEquals(1, (long)foundEntity.getVersion());
+        assertEquals(1, (long) foundEntity.getVersion());
         assertEquals("n2", foundEntity.getName());
     }
 
@@ -96,17 +96,19 @@ public class PersistenceTests {
         repository.save(entity1);
 
         //  Update the entity using the second entity object.
-        // This should fail since the second entity now holds a old version number, i.e. a Optimistic Lock Error
+        // This should fail since the second entity now holds a old version number,
+        // i.e. a Optimistic Lock Error
         try {
             entity2.setName("n2");
             repository.save(entity2);
 
             fail("Expected an OptimisticLockingFailureException");
-        } catch (OptimisticLockingFailureException e) {}
+        } catch (OptimisticLockingFailureException ignored) {
+        }
 
         // Get the updated entity from the database and verify its new sate
         ProductEntity updatedEntity = repository.findById(savedEntity.getId()).get();
-        assertEquals(1, (int)updatedEntity.getVersion());
+        assertEquals(1, (int) updatedEntity.getVersion());
         assertEquals("n1", updatedEntity.getName());
     }
 
@@ -126,18 +128,20 @@ public class PersistenceTests {
         nextPage = testNextPage(nextPage, "[1009, 1010]", false);
     }
 
-    private Pageable testNextPage(Pageable nextPage, String expectedProductIds, boolean expectsNextPage) {
+    private Pageable testNextPage(Pageable nextPage, String expectedProductIds,
+                                  boolean expectsNextPage) {
         Page<ProductEntity> productPage = repository.findAll(nextPage);
-        assertEquals(expectedProductIds, productPage.getContent().stream().map(p -> p.getProductId()).collect(Collectors.toList()).toString());
+        assertEquals(expectedProductIds,
+            productPage.getContent().stream().map(ProductEntity::getProductId).collect(Collectors.toList()).toString());
         assertEquals(expectsNextPage, productPage.hasNext());
         return productPage.nextPageable();
     }
 
     private void assertEqualsProduct(ProductEntity expectedEntity, ProductEntity actualEntity) {
-        assertEquals(expectedEntity.getId(),               actualEntity.getId());
-        assertEquals(expectedEntity.getVersion(),          actualEntity.getVersion());
-        assertEquals(expectedEntity.getProductId(),        actualEntity.getProductId());
-        assertEquals(expectedEntity.getName(),           actualEntity.getName());
-        assertEquals(expectedEntity.getWeight(),           actualEntity.getWeight());
+        assertEquals(expectedEntity.getId(), actualEntity.getId());
+        assertEquals(expectedEntity.getVersion(), actualEntity.getVersion());
+        assertEquals(expectedEntity.getProductId(), actualEntity.getProductId());
+        assertEquals(expectedEntity.getName(), actualEntity.getName());
+        assertEquals(expectedEntity.getWeight(), actualEntity.getWeight());
     }
 }
