@@ -17,7 +17,7 @@ apply plugin: 'io.spring.dependency-management'
 
 group = 'io.github.ddojai.channel.composite.product'
 version = '1.0.0-SNAPSHOT'
-sourceCompatibility = '1.8'
+sourceCompatibility = 1.8
 
 repositories {
 	mavenCentral()
