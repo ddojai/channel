@@ -94,6 +94,8 @@ logging:
     root: INFO
     io.github.ddojai.channel: DEBUG
 
+# 상용환경에서는 액추에이터 엔드포인트 정보 최소화 필요
+# https://docs.spring.io/spring-boot/docs/current/reference/html/
 management.endpoint.health.show-details: "ALWAYS"
 management.endpoints.web.exposure.include: "*"
 ---

@@ -2,10 +2,13 @@ package io.github.ddojai.channel.core.review.persistence;
 
 import javax.persistence.*;
 
+import static java.lang.String.format;
+
 @Entity
 @Table(name = "reviews", indexes = {@Index(name = "reviews_unique_idx", unique = true,
     columnList = "productId,reviewId")})
 public class ReviewEntity {
+
     @Id
     @GeneratedValue
     private int id;
@@ -29,6 +32,11 @@ public class ReviewEntity {
         this.author = author;
         this.subject = subject;
         this.content = content;
+    }
+
+    @Override
+    public String toString() {
+        return format("ReviewEntity: %s/%d", productId, reviewId);
     }
 
     public int getId() {

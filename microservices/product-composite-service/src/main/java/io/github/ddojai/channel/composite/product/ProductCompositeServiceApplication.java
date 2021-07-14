@@ -1,18 +1,22 @@
 package io.github.ddojai.channel.composite.product;
 
+import io.github.ddojai.channel.composite.product.services.ProductCompositeIntegration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.actuate.health.*;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.client.RestTemplate;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spring.web.plugins.Docket;
 
+import java.util.LinkedHashMap;
+
 import static java.util.Collections.emptyList;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 import static springfox.documentation.builders.RequestHandlerSelectors.basePackage;
 import static springfox.documentation.spi.DocumentationType.SWAGGER_2;
 
@@ -39,14 +43,22 @@ public class ProductCompositeServiceApplication {
     @Value("${api.common.contact.email}")
     String apiContactEmail;
 
+    /**
+     * Will exposed on $HOST:$PORT/swagger-ui.html
+     *
+     * @return
+     */
     @Bean
     public Docket apiDocumentation() {
+
         return new Docket(SWAGGER_2)
             .select()
             .apis(basePackage("io.github.ddojai.channel.composite.product"))
             .paths(PathSelectors.any())
             .build()
-            .globalResponseMessage(RequestMethod.GET, emptyList())
+            .globalResponseMessage(POST, emptyList())
+            .globalResponseMessage(GET, emptyList())
+            .globalResponseMessage(DELETE, emptyList())
             .apiInfo(new ApiInfo(
                 apiTitle,
                 apiDescription,
@@ -59,9 +71,23 @@ public class ProductCompositeServiceApplication {
             ));
     }
 
+    @Autowired
+    HealthAggregator healthAggregator;
+
+    @Autowired
+    ProductCompositeIntegration integration;
+
     @Bean
-    RestTemplate restTemplate() {
-        return new RestTemplate();
+    ReactiveHealthIndicator coreServices() {
+
+        ReactiveHealthIndicatorRegistry registry =
+            new DefaultReactiveHealthIndicatorRegistry(new LinkedHashMap<>());
+
+        registry.register("product", () -> integration.getProductHealth());
+        registry.register("recommendation", () -> integration.getRecommendationHealth());
+        registry.register("review", () -> integration.getReviewHealth());
+
+        return new CompositeReactiveHealthIndicator(healthAggregator, registry);
     }
 
     public static void main(String[] args) {
