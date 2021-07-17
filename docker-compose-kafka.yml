@@ -107,7 +107,6 @@ services:
     depends_on:
       - kafka
 
-  # $ mongo
   mongodb:
     image: mongo:3.6.9
     mem_limit: 350m
@@ -115,7 +114,6 @@ services:
       - "27017:27017"
     command: mongod --smallfiles
 
-  # $ mysql -uroot -h127.0.0.1 -p
   mysql:
     image: mysql:5.7
     mem_limit: 350m

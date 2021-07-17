@@ -11,7 +11,7 @@
 
 ### build
 ```cmd
-./grdelw clean build
+./gradlew clean build
 ```
 
 ### run
@@ -29,7 +29,7 @@ java -jar microservices/product-service/build/libs/*.jar &
 ### build and run
 ```cmd
 # gradle build를 안할 경우 수정내용이 반영이 안된다. (application.yml)
-./grdelw clean build
+./gradlew clean build
 docker-compose build
 docker-compose up -d
 ```
@@ -63,5 +63,5 @@ docker-compose up -d --scale product=1
 
 ### build and test
 ```cmd
-./grdelw clean build && docker-compose build && ./test-em-all.bash start stop
+./gradlew clean build && docker-compose build && ./test-em-all.bash start stop
 ```
