@@ -2,6 +2,13 @@
 
 - https://github.com/PacktPublishing/Hands-On-Microservices-with-Spring-Boot-and-Spring-Cloud
 
+## component
+- 서비스 검색 : 넷플릭스 유레카 및 스프링 클라우드 로드 밸런서
+- 에지 서버 : 스프링 클라우드 게이트웨이 및 스프링 시큐리티 OAuth
+- 구성 중앙화 : 스프링 클라우드 컨피그 서버
+- 서킷 브레이커 : Resillience4j
+- 분산 추적 : 스프링 클라우드 슬루스 및 집킨
+
 ## create projects
 ```cmd
 ./create-projects.bash
