@@ -53,10 +53,16 @@ server.error.include-message: always
 
 spring.application.name: product-composite
 
+app:
+  eureka-username: u
+  eureka-password: p
+  eureka-server: localhost
+  auth-server: localhost
+
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: "http://${app.eureka-username}:${app.eureka-password}@${app.eureka-server}:8761/eureka/"
     initialInstanceInfoReplicationIntervalSeconds: 5
     registryFetchIntervalSeconds: 5
   instance:
@@ -99,8 +105,6 @@ logging:
     root: INFO
     io.github.ddojai.channel: DEBUG
 
-# 상용환경에서는 액추에이터 엔드포인트 정보 최소화 필요
-# https://docs.spring.io/spring-boot/docs/current/reference/html/
 management.endpoint.health.show-details: "ALWAYS"
 management.endpoints.web.exposure.include: "*"
 ---
@@ -108,8 +112,10 @@ spring.profiles: docker
 
 server.port: 8080
 
-eureka.client.serviceUrl.defaultZone: http://eureka:8761/eureka/
-
 spring.rabbitmq.host: rabbitmq
 
 spring.cloud.stream.kafka.binder.brokers: kafka
+
+app:
+  eureka-server: eureka
+  auth-server: auth-server
