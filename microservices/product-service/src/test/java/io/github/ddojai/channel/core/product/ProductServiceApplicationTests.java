@@ -25,8 +25,7 @@ import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = RANDOM_PORT, properties = {"spring.data.mongodb.port: 0",
-    "eureka.client.enabled=false"})
+@SpringBootTest(webEnvironment=RANDOM_PORT, properties = {"spring.data.mongodb.port: 0", "eureka.client.enabled=false", "spring.cloud.config.enabled=false", "server.error.include-message=always"})
 public class ProductServiceApplicationTests {
 
     @Autowired
@@ -52,12 +51,12 @@ public class ProductServiceApplicationTests {
         int productId = 1;
 
         assertNull(repository.findByProductId(productId).block());
-        assertEquals(0, (long) repository.count().block());
+        assertEquals(0, (long)repository.count().block());
 
         sendCreateProductEvent(productId);
 
         assertNotNull(repository.findByProductId(productId).block());
-        assertEquals(1, (long) repository.count().block());
+        assertEquals(1, (long)repository.count().block());
 
         getAndVerifyProduct(productId, OK)
             .jsonPath("$.productId").isEqualTo(productId);
@@ -78,8 +77,8 @@ public class ProductServiceApplicationTests {
             sendCreateProductEvent(productId);
             fail("Expected a MessagingException here!");
         } catch (MessagingException me) {
-            if (me.getCause() instanceof InvalidInputException) {
-                InvalidInputException iie = (InvalidInputException) me.getCause();
+            if (me.getCause() instanceof InvalidInputException)	{
+                InvalidInputException iie = (InvalidInputException)me.getCause();
                 assertEquals("Duplicate key, Product Id: " + productId, iie.getMessage());
             } else {
                 fail("Expected a InvalidInputException as the root cause!");
@@ -128,13 +127,11 @@ public class ProductServiceApplicationTests {
             .jsonPath("$.message").isEqualTo("Invalid productId: " + productIdInvalid);
     }
 
-    private WebTestClient.BodyContentSpec getAndVerifyProduct(int productId,
-                                                              HttpStatus expectedStatus) {
+    private WebTestClient.BodyContentSpec getAndVerifyProduct(int productId, HttpStatus expectedStatus) {
         return getAndVerifyProduct("/" + productId, expectedStatus);
     }
 
-    private WebTestClient.BodyContentSpec getAndVerifyProduct(String productIdPath,
-                                                              HttpStatus expectedStatus) {
+    private WebTestClient.BodyContentSpec getAndVerifyProduct(String productIdPath, HttpStatus expectedStatus) {
         return client.get()
             .uri("/product" + productIdPath)
             .accept(APPLICATION_JSON)
