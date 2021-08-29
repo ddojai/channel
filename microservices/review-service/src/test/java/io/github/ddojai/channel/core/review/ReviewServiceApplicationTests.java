@@ -28,8 +28,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment=RANDOM_PORT, properties = {
-    "logging.level.se.magnus=DEBUG",
-    "eureka.client.enabled=false",
+    "logging.level.io.github.ddojai.channel=DEBUG",
     "spring.cloud.config.enabled=false",
     "spring.datasource.url=jdbc:h2:mem:review-db",
     "server.error.include-message=always"})
